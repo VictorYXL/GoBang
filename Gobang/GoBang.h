@@ -5,8 +5,7 @@
 
 struct Board
 {
-    int height;
-    int width;
+    int height, width;
     //  -1 player 0 space 1 computer
     int **checkerboard;
 
@@ -24,4 +23,4 @@ struct Board
 };
 int Go(Board *board, int x, int y, int player);
 void Evaluate(Board *board, int &targetx, int &targety);
-int SingleEvaluate(Board *board, int x, int y, int player);
+//int SingleEvaluate(Board *board, int x, int y, int player);
