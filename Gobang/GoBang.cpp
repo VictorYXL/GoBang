@@ -109,11 +109,11 @@ int Go(Board *board, int x, int y, int player)
 }
 bool JudgeMove(Board *board,int x, int y, int dx, int dy, int player)
 {
-    return board->checkerboard[x][y] == player &&
-        board->checkerboard[x + dx][y + dy] == player &&
-        board->checkerboard[x + 2 * dx][y + 2 * dy] == player &&
-        board->checkerboard[x + 3 * dx][y + 3 * dy] == player && 
-        board->checkerboard[x + 4 * dx][y + 4 * dy] == player;
+    return board->checkerboard[y][x] == player &&
+        board->checkerboard[y + dy][x + dx] == player &&
+        board->checkerboard[y + 2 * dy][x + 2 * dx] == player &&
+        board->checkerboard[y + 3 * dy][x + 3 * dx] == player && 
+        board->checkerboard[y + 4 * dy][x + 4 * dx] == player;
 };
 bool JudgeWin(Board *board, int x, int y, int player)
 {
