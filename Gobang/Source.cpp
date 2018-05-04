@@ -3,7 +3,8 @@
 #include <vector>
 #include "GoBang.h"
 
-#define PLAYER 0
+#define PLAYER 1
+#define PLAYE_RFIRST 1
 
 void color(int a)
 {
@@ -57,16 +58,23 @@ void ShowStep(std::vector<std::pair<int, int>>  computer, std::vector<std::pair<
 int main()
 {
     Board *board = new Board(17, 17);
-    int x = 8, y = 8;
+    int x = -1, y = -1;
     int res;
     std::vector<std::pair<int, int>> computer, player;
-    //Go(board, x, y, 1);
+
+#ifndef PLAYE_RFIRST
+    Evaluate(board, x, y);
+    Go(board, x, y, 1);
+#endif
+
     while (1)
     {
         showBoard(board);
-        printf("Computer:%d,%d\n", x, y);
-        printf("User:", x, y);
+        color(14);
+        printf("Computer(o):%d,%d\n", x, y);
+        color(11);
 #ifdef PLAYER
+        printf("User(x):", x, y);
         res = 1;
         while (res == 1)
         {
@@ -81,23 +89,31 @@ int main()
 #else
         Evaluate(board, x, y);
         Go(board, x, y, -1);
+        printf("Computer(x):%d,%d\n", x, y);
 #endif // PLAYER
-        
+        color(FOREGROUND_INTENSITY);
+
         showBoard(board);
         if (JudgeWin(board, x, y, -1))
         {
-            printf("Player wins!");
+            color(11);
+            printf("Player wins!\n");
+            color(FOREGROUND_INTENSITY);
             break;
         }
+
         Evaluate(board, x, y);
         Go(board, x, y, 1);
         computer.push_back(std::pair<int, int>(x, y));
+
         if (JudgeWin(board, x, y, 1))
         {
-            printf("Computer wins!");
+            color(14);
+            printf("Computer wins!\n");
+            color(FOREGROUND_INTENSITY);
             break;
         }
-        //system("pause");
     }
+    system("pause");
     return 0;
 }

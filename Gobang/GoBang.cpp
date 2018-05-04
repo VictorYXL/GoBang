@@ -125,7 +125,7 @@ bool JudgeWin(Board *board, int x, int y, int player)
                 return true;
             if (tx < board->width - 4 && JudgeMove(board, tx, ty, 1, 0, player))
                 return true;
-            if (ty >= 4 && JudgeMove(board, tx, ty, -1, 0, player))
+            if (ty >= 4 && JudgeMove(board, tx, ty, 0, -1, player))
                 return true;
             if (ty < board->height - 4 && JudgeMove(board, tx, ty, 0, 1, player))
                 return true;
