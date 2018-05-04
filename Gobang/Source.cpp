@@ -1,4 +1,5 @@
 #include <iostream>
+#include <Windows.h>
 #include "GoBang.h"
 
 void showBoard(Board *board)
@@ -33,16 +34,25 @@ int main()
     while (1)
     {
         showBoard(board);
-        res = 1;
+        Evaluate(board, x, y);
+        if (x == -1 || y == -1)
+        {
+            Go(board, x, y, -1);
+            printf("Win!");
+            return 0;
+        }
+        Go(board, x, y, -1);
+        
+        /*res = 1;
         while (res == 1)
         {
             std::cin >> x >> y;
             res = Go(board, x, y, -1);
-        }
+        }*/
         showBoard(board);
         Evaluate(board, x, y);
         Go(board, x, y, 1);
-        showBoard(board);
+        //system("pause");
     }
     //Evaluate(board, 1, x, y, score);
     //printf("%d,%d,%d", x, y, score);

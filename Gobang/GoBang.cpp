@@ -50,23 +50,29 @@ int SingleEvaluate(Board *board, int x, int y, int player)
     board->checkerboard[y][x] = player;
     GetNeighbor(board, x, y, player, neighbor);
     board->checkerboard[y][x] = 0;
-    std::string mode[16] =
+    std::string mode[17] =
     {
+        ".*oooooo.*",
         ".*ooooo.*", ".*_oooo_.*", ".*_ooo__.*", ".*__ooo_.*",
         ".*_oo_o_.*", ".*_o_oo_.*", ".*oooo_.*", ".*_oooo.*",
         ".*oo_oo.*", ".*o_ooo.*", ".*ooo_o.*", ".*__oo__.*",
-        ".*__o_o_.*", ".*_o_o__.*", ".*___o__.*", ".*__o___.*"
+        ".*__o_o_.*", ".*_o_o__.*", ".*___o__.*", ".*__o___.*",
     };
     int score[16] = { 50000, 4320, 720, 720, 720, 720, 720, 720, 720, 720, 720, 120, 120, 120, 20, 20 };
     int totalScore = 0;
     for (int i = 0; i < 4; i++)
-    {        
-        for (int j = 0; j < 16; j++)
+    {
+        std::regex reg(mode[0]);
+        if (std::regex_match(neighbor[i].c_str(), reg))
+        {
+            return -1;
+        }
+        for (int j = 1; j < 17; j++)
         {
             std::regex reg(mode[j]);
             if (std::regex_match(neighbor[i].c_str(), reg))
             {
-                totalScore += score[j];
+                totalScore += score[j - 1];
                 break;
             }
         }
@@ -84,6 +90,12 @@ void Evaluate(Board *board, int &targetx, int &targety)
             if (board->checkerboard[y][x] == 0)
             {
                 offenseScore = SingleEvaluate(board, x, y, 1);
+                if (offenseScore < 0)
+                {
+                    targetx = -1;
+                    targety = -1;
+                    return;
+                }
                 defenseScore = SingleEvaluate(board, x, y, -1);
                 if (offenseScore + defenseScore > score)
                 {
