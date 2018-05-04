@@ -1,10 +1,20 @@
 #include <iostream>
 #include <Windows.h>
+#include <vector>
 #include "GoBang.h"
 
+#define PLAYER 0
+
+void color(int a)
+{
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), a);
+}
 void showBoard(Board *board)
 {
+    HANDLE  hConsole;
+    hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     system("cls");
+    color(FOREGROUND_INTENSITY);
     printf("   ");
     for (int i = 0; i < board->width; i++)
         printf("%3d", i);
@@ -15,45 +25,79 @@ void showBoard(Board *board)
         for (int j = 0; j < board->width; j++)
         {
             if (board->checkerboard[i][j] == -1)
+            {
+                color(11);
                 printf(" x ");
+                color(FOREGROUND_INTENSITY);
+            }
             else if (board->checkerboard[i][j] == 1)
+            {
+                color(14);
                 printf(" o ");
-            else printf(" . ");
-            // printf("%3d", SingleEvaluate(board, j, i, -1));
+                color(FOREGROUND_INTENSITY);
+            }
+            else
+            {
+                printf(" . ");
+            }
                 
         }
         printf("\n");
     }
 }
+void ShowStep(std::vector<std::pair<int, int>>  computer, std::vector<std::pair<int, int>>  player)
+{
+    printf("Computer:\n  ");
+    for (auto i = computer.begin(); i != computer.end(); i++)
+        printf("(%d,%d) ", i->first, i->second);
+    printf("\nPlayer:\n  ");
+    for (auto i = player.begin(); i != player.end(); i++)
+        printf("(%d,%d) ", i->first, i->second);
+}
 int main()
 {
     Board *board = new Board(17, 17);
-    int x, y, score = 0;
-    int res = 1;
-    Go(board, 8, 8, 1);
+    int x = 8, y = 8;
+    int res;
+    std::vector<std::pair<int, int>> computer, player;
+    //Go(board, x, y, 1);
     while (1)
     {
         showBoard(board);
-        Evaluate(board, x, y);
-        if (x == -1 || y == -1)
-        {
-            Go(board, x, y, -1);
-            printf("Win!");
-            return 0;
-        }
-        Go(board, x, y, -1);
-        
-        /*res = 1;
+        printf("Computer:%d,%d\n", x, y);
+        printf("User:", x, y);
+#ifdef PLAYER
+        res = 1;
         while (res == 1)
         {
-            std::cin >> x >> y;
+            scanf("%d%d", &x, &y);
+            if (x == -1)
+            {
+                ShowStep(computer, player);
+            }
             res = Go(board, x, y, -1);
-        }*/
+            player.push_back(std::pair<int, int>(x, y));
+        }
+#else
+        Evaluate(board, x, y);
+        Go(board, x, y, -1);
+#endif // PLAYER
+        
         showBoard(board);
+        if (JudgeWin(board, x, y, -1))
+        {
+            printf("Player wins!");
+            break;
+        }
         Evaluate(board, x, y);
         Go(board, x, y, 1);
+        computer.push_back(std::pair<int, int>(x, y));
+        if (JudgeWin(board, x, y, 1))
+        {
+            printf("Computer wins!");
+            break;
+        }
         //system("pause");
     }
-    //Evaluate(board, 1, x, y, score);
-    //printf("%d,%d,%d", x, y, score);
+    return 0;
 }

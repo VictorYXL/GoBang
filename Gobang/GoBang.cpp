@@ -1,5 +1,6 @@
 #include "GoBang.h"
 #include <regex>  
+#define JUDGEWIN(dx, dy)  board->checkerboard[x][y] == player && board->checkerboard[x + dx][y + dy] == player && board->checkerboard[x + 2 * dx][y + 2 * dy] == player &&board->checkerboard[x + 3 * dx][y + 3 * dy] == player && board->checkerboard[x + 4 * dx][y + 4 * dy] == player
 std::string* GetNeighbor(Board *board, int x, int y, int player, std::string neighbor[4])
 {
     int bx = x - 4 > 0 ? -4 : -x, ex = x + 4 > board->width - 1 ? board->width - x - 1 : 4;
@@ -50,9 +51,8 @@ int SingleEvaluate(Board *board, int x, int y, int player)
     board->checkerboard[y][x] = player;
     GetNeighbor(board, x, y, player, neighbor);
     board->checkerboard[y][x] = 0;
-    std::string mode[17] =
+    std::string mode[16] =
     {
-        ".*oooooo.*",
         ".*ooooo.*", ".*_oooo_.*", ".*_ooo__.*", ".*__ooo_.*",
         ".*_oo_o_.*", ".*_o_oo_.*", ".*oooo_.*", ".*_oooo.*",
         ".*oo_oo.*", ".*o_ooo.*", ".*ooo_o.*", ".*__oo__.*",
@@ -62,17 +62,12 @@ int SingleEvaluate(Board *board, int x, int y, int player)
     int totalScore = 0;
     for (int i = 0; i < 4; i++)
     {
-        std::regex reg(mode[0]);
-        if (std::regex_match(neighbor[i].c_str(), reg))
-        {
-            return -1;
-        }
-        for (int j = 1; j < 17; j++)
+        for (int j = 0; j < 16; j++)
         {
             std::regex reg(mode[j]);
             if (std::regex_match(neighbor[i].c_str(), reg))
             {
-                totalScore += score[j - 1];
+                totalScore += score[j];
                 break;
             }
         }
@@ -90,12 +85,6 @@ void Evaluate(Board *board, int &targetx, int &targety)
             if (board->checkerboard[y][x] == 0)
             {
                 offenseScore = SingleEvaluate(board, x, y, 1);
-                if (offenseScore < 0)
-                {
-                    targetx = -1;
-                    targety = -1;
-                    return;
-                }
                 defenseScore = SingleEvaluate(board, x, y, -1);
                 if (offenseScore + defenseScore > score)
                 {
@@ -117,4 +106,40 @@ int Go(Board *board, int x, int y, int player)
         return 0;
     }
     return 1;
+}
+bool JudgeMove(Board *board,int x, int y, int dx, int dy, int player)
+{
+    return board->checkerboard[x][y] == player &&
+        board->checkerboard[x + dx][y + dy] == player &&
+        board->checkerboard[x + 2 * dx][y + 2 * dy] == player &&
+        board->checkerboard[x + 3 * dx][y + 3 * dy] == player && 
+        board->checkerboard[x + 4 * dx][y + 4 * dy] == player;
+};
+bool JudgeWin(Board *board, int x, int y, int player)
+{
+    for (int tx = (x - 4 > 0 ? x - 4 : 0); tx < (x + 4 < board->width ? x + 4 : board->width); tx++)
+    {
+        for (int ty = y - 4 > 0 ? y - 4 : 0; ty < (y + 4 < board->height ? y + 4 : board->height); ty++)
+        {
+            if (tx >= 4 && JudgeMove(board, tx, ty, -1, 0, player))
+                return true;
+            if (tx < board->width - 4 && JudgeMove(board, tx, ty, 1, 0, player))
+                return true;
+            if (ty >= 4 && JudgeMove(board, tx, ty, -1, 0, player))
+                return true;
+            if (ty < board->height - 4 && JudgeMove(board, tx, ty, 0, 1, player))
+                return true;
+            if (tx >= 4 && ty >= 4 && JudgeMove(board, tx, ty, -1, -1, player))
+                return true;
+            if (tx < board->width - 4 && ty < board->height - 4 && JudgeMove(board, tx, ty, 1, 1, player))
+                return true;
+            if (tx >= 4 && ty < board->height - 4 && JudgeMove(board, tx, ty, -1, 1, player))
+                return true;
+            if (tx < board->width - 4 && ty >= 4 && JudgeMove(board, tx, ty, 1, -1, player))
+                return true;
+
+        }
+    }
+
+    return false;
 }
